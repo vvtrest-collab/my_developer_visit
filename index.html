@@ -310,8 +310,50 @@
             align-items: center;
             background: radial-gradient(circle at top right, #1e293b, #0f172a);
             padding: 20px;
-            min-height: 100vh
+            min-height: 100vh;
+            position: relative;
+            transition: background 0.4s ease;
         }
+
+        /* Фон прайса — сетка и glow */
+        .main-content::before,
+        .main-content::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+        /* mesh glow */
+        .main-content::before {
+            background:
+                radial-gradient(ellipse 70% 50% at 15% 20%, rgba(63,130,255,0.10) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 85% 75%, rgba(56,189,248,0.08) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 60% at 50% 110%, rgba(99,30,220,0.07) 0%, transparent 60%);
+        }
+        /* grid lines */
+        .main-content::after {
+            background-image:
+                linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+            background-size: 44px 44px;
+            -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 40%, transparent 100%);
+            mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 40%, transparent 100%);
+        }
+
+        body:has(#page-pricing.active) .main-content {
+            background: #080b12;
+        }
+        body:has(#page-pricing.active) .main-content::before,
+        body:has(#page-pricing.active) .main-content::after {
+            opacity: 1;
+        }
+
+        /* Контент прайса поверх псевдоэлементов */
+        #page-pricing { position: relative; z-index: 1; align-items: flex-start; padding-top: 10px; }
+
 
         .page {
             display: none;
@@ -604,6 +646,202 @@
             display: block
         }
 
+        /* ====== ПРАЙС — стили ====== */
+        :root {
+          --pr-cyan: #38bdf8;
+          --pr-cyan-dim: rgba(56,189,248,0.12);
+          --pr-cyan-glow: rgba(56,189,248,0.28);
+          --pr-amber: #ffb547;
+          --pr-muted: #64748b;
+          --pr-border: rgba(255,255,255,0.08);
+          --pr-border-glow: rgba(56,189,248,0.22);
+          --pr-surface: rgba(255,255,255,0.04);
+          --pr-r: 18px;
+        }
+
+        .pricing-page {
+          width: 100%;
+          max-width: 920px;
+          padding: 10px 0 30px;
+        }
+
+        .pricing-header {
+          text-align: center;
+          margin-bottom: 36px;
+        }
+
+        .pricing-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          background: var(--pr-cyan-dim);
+          border: 1px solid var(--pr-border-glow);
+          border-radius: 100px;
+          padding: 5px 14px;
+          font-size: 11px;
+          font-weight: 600;
+          color: var(--pr-cyan);
+          letter-spacing: .07em;
+          text-transform: uppercase;
+          margin-bottom: 14px;
+        }
+        .pricing-badge::before {
+          content: '';
+          width: 6px; height: 6px;
+          background: var(--pr-cyan);
+          border-radius: 50%;
+          box-shadow: 0 0 6px var(--pr-cyan);
+          animation: pr-pulse 2s ease infinite;
+        }
+        @keyframes pr-pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+        .pricing-title {
+          font-size: clamp(24px,4vw,40px);
+          font-weight: 800;
+          line-height: 1.1;
+          letter-spacing: -.02em;
+          color: #f1f5f9;
+          margin-bottom: 10px;
+        }
+        .pricing-title span {
+          background: linear-gradient(135deg, var(--pr-cyan), #818cf8);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .pricing-sub {
+          color: var(--pr-muted);
+          font-size: 14px;
+          max-width: 420px;
+          margin: 0 auto;
+          line-height: 1.6;
+        }
+
+        /* Cards */
+        .pricing-cards {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          align-items: start;
+        }
+        @media(max-width:780px) {
+          .pricing-cards { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+        }
+
+        .pr-card {
+          background: var(--pr-surface);
+          border: 1px solid var(--pr-border);
+          border-radius: var(--pr-r);
+          padding: 26px 22px 22px;
+          position: relative;
+          overflow: hidden;
+          transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
+        }
+        .pr-card:hover {
+          transform: translateY(-5px);
+          border-color: var(--pr-border-glow);
+          box-shadow: 0 20px 50px -12px rgba(0,0,0,.6), 0 0 0 1px rgba(56,189,248,.08);
+        }
+        .pr-card--featured {
+          background: linear-gradient(145deg, rgba(56,189,248,0.07), rgba(129,140,248,0.06));
+          border-color: rgba(56,189,248,0.2);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .pr-card--featured:hover {
+          box-shadow: 0 24px 60px -10px rgba(56,189,248,.18), 0 0 0 1px rgba(56,189,248,.28);
+        }
+        .pr-glow {
+          position: absolute;
+          top: -40px; right: -40px;
+          width: 150px; height: 150px;
+          background: radial-gradient(circle, rgba(56,189,248,0.15), transparent 70%);
+          pointer-events: none;
+        }
+
+        .pr-tag {
+          display: inline-block;
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          padding: 2px 9px;
+          border-radius: 100px;
+          margin-bottom: 14px;
+        }
+        .pr-tag--default { background: rgba(255,255,255,0.07); color: var(--pr-muted); }
+        .pr-tag--featured { background: var(--pr-cyan-dim); color: var(--pr-cyan); border: 1px solid var(--pr-border-glow); }
+        .pr-tag--amber { background: rgba(255,181,71,0.1); color: var(--pr-amber); border: 1px solid rgba(255,181,71,0.2); }
+
+        .pr-icon { font-size: 28px; display: block; margin-bottom: 10px; filter: drop-shadow(0 0 6px rgba(56,189,248,.25)); }
+
+        .pr-name { font-size: 17px; font-weight: 700; margin-bottom: 5px; letter-spacing: -.01em; color: #f1f5f9; }
+        .pr-desc { font-size: 12.5px; color: var(--pr-muted); line-height: 1.5; margin-bottom: 18px; min-height: 38px; }
+
+        .pr-price { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--pr-border); }
+        .pr-from { font-size: 10px; color: var(--pr-muted); text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 2px; }
+        .pr-amount { font-size: 36px; font-weight: 800; letter-spacing: -.03em; line-height: 1; color: #f1f5f9; }
+        .pr-amount--cyan { color: var(--pr-cyan); }
+        .pr-curr { font-size: 19px; font-weight: 600; vertical-align: super; margin-right: 1px; }
+        .pr-note { font-size: 11px; color: var(--pr-muted); margin-top: 4px; }
+
+        .pr-features { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 18px; }
+        .pr-features li { display: flex; align-items: flex-start; gap: 9px; font-size: 12.5px; color: #c2cedf; line-height: 1.4; }
+        .pr-check { flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; margin-top: 1px; }
+        .pr-check--cyan  { background: var(--pr-cyan-dim); color: var(--pr-cyan); }
+        .pr-check--muted { background: rgba(255,255,255,0.06); color: var(--pr-muted); }
+        .pr-check--amber { background: rgba(255,181,71,0.1); color: var(--pr-amber); }
+
+        .pr-deadline { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--pr-muted); margin-bottom: 16px; }
+        .pr-deadline b { color: #f1f5f9; font-weight: 500; }
+
+        .pr-btn {
+          display: block; width: 100%;
+          padding: 11px 16px;
+          border-radius: 11px;
+          font-size: 13px; font-weight: 600;
+          text-align: center; text-decoration: none;
+          border: none; cursor: pointer;
+          transition: all .22s ease;
+        }
+        .pr-btn--outline { background: transparent; border: 1px solid var(--pr-border); color: #f1f5f9; }
+        .pr-btn--outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.18); }
+        .pr-btn--primary {
+          background: linear-gradient(135deg, var(--pr-cyan) 0%, #4f9eff 100%);
+          color: #0f172a;
+          box-shadow: 0 6px 20px -5px var(--pr-cyan-glow);
+        }
+        .pr-btn--primary:hover { box-shadow: 0 10px 28px -5px var(--pr-cyan-glow); transform: translateY(-1px); }
+        .pr-btn--amber { background: transparent; border: 1px solid rgba(255,181,71,0.3); color: var(--pr-amber); }
+        .pr-btn--amber:hover { background: rgba(255,181,71,0.07); border-color: rgba(255,181,71,0.55); }
+
+        /* Hourly */
+        .pr-hourly { margin-top: 24px; text-align: center; }
+        .pr-hourly-inner {
+          display: inline-flex; align-items: center; gap: 18px;
+          background: var(--pr-surface);
+          border: 1px solid var(--pr-border);
+          border-radius: 13px;
+          padding: 14px 24px;
+          flex-wrap: wrap; justify-content: center;
+        }
+        .pr-hourly-label { font-size: 10px; color: var(--pr-muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 3px; }
+        .pr-hourly-price { font-size: 26px; font-weight: 800; color: var(--pr-amber); letter-spacing: -.02em; }
+        .pr-hourly-div { width: 1px; height: 36px; background: var(--pr-border); }
+        .pr-hourly-sub { font-size: 12px; color: var(--pr-muted); max-width: 200px; line-height: 1.5; }
+
+        /* Note */
+        .pr-note-wrap { margin-top: 16px; text-align: center; }
+        .pr-note-box {
+          display: inline-flex; align-items: center; gap: 10px;
+          background: var(--pr-surface);
+          border: 1px solid var(--pr-border);
+          border-radius: 12px;
+          padding: 12px 20px;
+          font-size: 13px; color: var(--pr-muted); line-height: 1.5;
+        }
+        .pr-note-box strong { color: #f1f5f9; }
+
         body:has(.sidebar.mobile-open) .mobile-menu-btn {
     opacity: 0;
     pointer-events: none;
@@ -646,6 +884,12 @@
                         <a href="#" onclick="showPage('projects');return false">
                             <i class="bi bi-code-slash"></i>
                             <span class="nav-text" data-i18n="navProjects">Проекты</span>
+                        </a>
+                    </li>
+                    <li id="nav-pricing">
+                        <a href="#" onclick="showPage('pricing');return false">
+                            <i class="bi bi-tag"></i>
+                            <span class="nav-text" data-i18n="navPricing">Прайс</span>
                         </a>
                     </li>
                 </ul>
@@ -708,6 +952,108 @@
                     <div class="projects-grid" id="projects-grid"></div>
                 </div>
             </div>
+
+            <!-- ====== ПРАЙС ====== -->
+            <div class="page" id="page-pricing">
+                <div class="pricing-page">
+
+                  <div class="pricing-header">
+                    <div class="pricing-badge" data-i18n="pricingBadge">Доступно к заказу</div>
+                    <h2 class="pricing-title" data-i18n="pricingTitle">Услуги <span>&amp; Стоимость</span></h2>
+                    <p class="pricing-sub" data-i18n="pricingSub">Разработка под ключ — от лендинга до Telegram-приложения с бэкендом</p>
+                  </div>
+
+                  <div class="pricing-cards">
+
+                    <!-- Лендинг -->
+                    <div class="pr-card">
+                      <span class="pr-tag pr-tag--default" data-i18n="prTag1">Старт</span>
+                      <span class="pr-icon">🖥️</span>
+                      <div class="pr-name" data-i18n="prName1">Лендинг / Визитка</div>
+                      <div class="pr-desc" data-i18n="prDesc1">Одностраничный сайт для бизнеса, портфолио или услуг</div>
+                      <div class="pr-price">
+                        <span class="pr-from" data-i18n="prFrom">от</span>
+                        <div class="pr-amount"><span class="pr-curr">$</span>50</div>
+                        <div class="pr-note" data-i18n="prNote1">до $150 · зависит от объёма</div>
+                      </div>
+                      <ul class="pr-features">
+                        <li><span class="pr-check pr-check--muted">✓</span><span data-i18n="prF1a">Адаптивная вёрстка (mobile-first)</span></li>
+                        <li><span class="pr-check pr-check--muted">✓</span><span data-i18n="prF1b">Форма обратной связи</span></li>
+                        <li><span class="pr-check pr-check--muted">✓</span><span data-i18n="prF1c">Галерея / портфолио</span></li>
+                        <li><span class="pr-check pr-check--muted">✓</span><span data-i18n="prF1d">Базовое SEO и метатеги</span></li>
+                      </ul>
+                      <div class="pr-deadline">⏱ <span data-i18n="prDeadline1">Срок: <b>2–4 дня</b></span></div>
+                      <a href="https://t.me/yourhandle" target="_blank" class="pr-btn pr-btn--outline" data-i18n="prBtn">Обсудить →</a>
+                    </div>
+
+                    <!-- Mini App (featured) -->
+                    <div class="pr-card pr-card--featured">
+                      <div class="pr-glow"></div>
+                      <span class="pr-tag pr-tag--featured" data-i18n="prTag2">★ Популярно</span>
+                      <span class="pr-icon">⚡</span>
+                      <div class="pr-name" data-i18n="prName2">Telegram Mini App</div>
+                      <div class="pr-desc" data-i18n="prDesc2">Полноценное приложение внутри Telegram с базой данных</div>
+                      <div class="pr-price">
+                        <span class="pr-from" data-i18n="prFrom">от</span>
+                        <div class="pr-amount pr-amount--cyan"><span class="pr-curr">$</span>200</div>
+                        <div class="pr-note" data-i18n="prNote2">до $600+ · для сложных проектов</div>
+                      </div>
+                      <ul class="pr-features">
+                        <li><span class="pr-check pr-check--cyan">✓</span><span data-i18n="prF2a">FastAPI бэкенд + PostgreSQL</span></li>
+                        <li><span class="pr-check pr-check--cyan">✓</span><span data-i18n="prF2b">Интеграция с Telegram Bot API</span></li>
+                        <li><span class="pr-check pr-check--cyan">✓</span><span data-i18n="prF2c">Авторизация через Telegram</span></li>
+                        <li><span class="pr-check pr-check--cyan">✓</span><span data-i18n="prF2d">Деплой на сервер / облако</span></li>
+                        <li><span class="pr-check pr-check--cyan">✓</span><span data-i18n="prF2e">Многоязычность (RU / KZ / EN)</span></li>
+                      </ul>
+                      <div class="pr-deadline">⏱ <span data-i18n="prDeadline2">Срок: <b>1–3 недели</b></span></div>
+                      <a href="https://t.me/yourhandle" target="_blank" class="pr-btn pr-btn--primary" data-i18n="prBtnMain">Заказать проект →</a>
+                    </div>
+
+                    <!-- Автоматизация -->
+                    <div class="pr-card">
+                      <span class="pr-tag pr-tag--amber" data-i18n="prTag3">Быстро</span>
+                      <span class="pr-icon">🤖</span>
+                      <div class="pr-name" data-i18n="prName3">Автоматизация</div>
+                      <div class="pr-desc" data-i18n="prDesc3">Скрипты, парсеры и боты для экономии вашего времени</div>
+                      <div class="pr-price">
+                        <span class="pr-from" data-i18n="prFrom">от</span>
+                        <div class="pr-amount"><span class="pr-curr">$</span>30</div>
+                        <div class="pr-note" data-i18n="prNote3">до $100 · за готовый скрипт</div>
+                      </div>
+                      <ul class="pr-features">
+                        <li><span class="pr-check pr-check--amber">✓</span><span data-i18n="prF3a">Парсинг данных и сайтов</span></li>
+                        <li><span class="pr-check pr-check--amber">✓</span><span data-i18n="prF3b">Telegram-бот под задачу</span></li>
+                        <li><span class="pr-check pr-check--amber">✓</span><span data-i18n="prF3c">Автоматическая рассылка</span></li>
+                        <li><span class="pr-check pr-check--amber">✓</span><span data-i18n="prF3d">Интеграция API сервисов</span></li>
+                      </ul>
+                      <div class="pr-deadline">⏱ <span data-i18n="prDeadline3">Срок: <b>1–3 дня</b></span></div>
+                      <a href="https://t.me/yourhandle" target="_blank" class="pr-btn pr-btn--amber" data-i18n="prBtn">Обсудить →</a>
+                    </div>
+
+                  </div><!-- /pricing-cards -->
+
+                  <!-- Hourly -->
+                  <div class="pr-hourly">
+                    <div class="pr-hourly-inner">
+                      <div>
+                        <div class="pr-hourly-label" data-i18n="prHourlyLabel">Почасовая ставка</div>
+                        <div class="pr-hourly-price">$10–15<span style="font-size:14px;color:var(--pr-muted);font-weight:400"> / час</span></div>
+                      </div>
+                      <div class="pr-hourly-div"></div>
+                      <div class="pr-hourly-sub" data-i18n="prHourlySub">Для нестандартных задач или правок вне проекта</div>
+                    </div>
+                  </div>
+
+                  <!-- Note -->
+                  <div class="pr-note-wrap">
+                    <div class="pr-note-box">
+                      <span style="font-size:18px">💬</span>
+                      <span data-i18n="prNoteText">Все цены <strong>договорные</strong> — пишите, обсудим детали вашего проекта</span>
+                    </div>
+                  </div>
+
+                </div>
+            </div>
         </main>
     </div>
 
@@ -719,6 +1065,7 @@
             ru: {
                 navHome: "Главная",
                 navProjects: "Проекты",
+                navPricing: "Прайс",
                 badgeDev: "Разработчик",
                 subtitle: "Начинающий FRONT END разработчик.",
                 welcome: "Добро пожаловать на мою персональную страницу!",
@@ -727,11 +1074,28 @@
                 projectsTitle: "Мои проекты",
                 footerText: "© 2026 VirusV",
                 openProject: "Открыть →",
-                emptyProjects: "Проектов пока нет.<br>Добавь первый прямо в коде!"
+                emptyProjects: "Проектов пока нет.<br>Добавь первый прямо в коде!",
+                pricingBadge: "Доступно к заказу",
+                pricingTitle: "Услуги <span>&amp; Стоимость</span>",
+                pricingSub: "Разработка под ключ — от лендинга до Telegram-приложения с бэкендом",
+                prFrom: "от", prTag1: "Старт", prTag2: "★ Популярно", prTag3: "Быстро",
+                prName1: "Лендинг / Визитка", prName2: "Telegram Mini App", prName3: "Автоматизация",
+                prDesc1: "Одностраничный сайт для бизнеса, портфолио или услуг",
+                prDesc2: "Полноценное приложение внутри Telegram с базой данных",
+                prDesc3: "Скрипты, парсеры и боты для экономии вашего времени",
+                prNote1: "до $150 · зависит от объёма", prNote2: "до $600+ · для сложных проектов", prNote3: "до $100 · за готовый скрипт",
+                prF1a:"Адаптивная вёрстка (mobile-first)",prF1b:"Форма обратной связи",prF1c:"Галерея / портфолио",prF1d:"Базовое SEO и метатеги",
+                prF2a:"FastAPI бэкенд + PostgreSQL",prF2b:"Интеграция с Telegram Bot API",prF2c:"Авторизация через Telegram",prF2d:"Деплой на сервер / облако",prF2e:"Многоязычность (RU / KZ / EN)",
+                prF3a:"Парсинг данных и сайтов",prF3b:"Telegram-бот под задачу",prF3c:"Автоматическая рассылка",prF3d:"Интеграция API сервисов",
+                prDeadline1:"Срок: <b>2–4 дня</b>", prDeadline2:"Срок: <b>1–3 недели</b>", prDeadline3:"Срок: <b>1–3 дня</b>",
+                prBtn:"Обсудить →", prBtnMain:"Заказать проект →",
+                prHourlyLabel:"Почасовая ставка", prHourlySub:"Для нестандартных задач или правок вне проекта",
+                prNoteText:"Все цены <strong>договорные</strong> — пишите, обсудим детали вашего проекта"
             },
             en: {
                 navHome: "Home",
                 navProjects: "Projects",
+                navPricing: "Pricing",
                 badgeDev: "Developer",
                 subtitle: "Junior FRONT END Developer.",
                 welcome: "Welcome to my personal page!",
@@ -740,11 +1104,28 @@
                 projectsTitle: "My Projects",
                 footerText: "© 2026 VirusV",
                 openProject: "Open →",
-                emptyProjects: "No projects yet.<br>Add the first one in the code!"
+                emptyProjects: "No projects yet.<br>Add the first one in the code!",
+                pricingBadge: "Available for Order",
+                pricingTitle: "Services <span>&amp; Pricing</span>",
+                pricingSub: "Turnkey development — from landing page to full Telegram app with backend",
+                prFrom:"from", prTag1:"Start", prTag2:"★ Popular", prTag3:"Fast",
+                prName1:"Landing / Card", prName2:"Telegram Mini App", prName3:"Automation",
+                prDesc1:"One-page site for business, portfolio or services",
+                prDesc2:"Full application inside Telegram with database",
+                prDesc3:"Scripts, parsers and bots to save your time",
+                prNote1:"up to $150 · depends on scope", prNote2:"up to $600+ · for complex projects", prNote3:"up to $100 · per script",
+                prF1a:"Adaptive layout (mobile-first)",prF1b:"Contact form",prF1c:"Gallery / portfolio",prF1d:"Basic SEO and meta tags",
+                prF2a:"FastAPI backend + PostgreSQL",prF2b:"Telegram Bot API integration",prF2c:"Telegram auth",prF2d:"Server / cloud deploy",prF2e:"Multilang (RU / KZ / EN)",
+                prF3a:"Data & website parsing",prF3b:"Custom Telegram bot",prF3c:"Automated newsletters",prF3d:"Third-party API integration",
+                prDeadline1:"Timeline: <b>2–4 days</b>", prDeadline2:"Timeline: <b>1–3 weeks</b>", prDeadline3:"Timeline: <b>1–3 days</b>",
+                prBtn:"Discuss →", prBtnMain:"Order project →",
+                prHourlyLabel:"Hourly rate", prHourlySub:"For custom tasks or revisions outside a fixed project",
+                prNoteText:"All prices are <strong>negotiable</strong> — write me to discuss your project details"
             },
             kk: {
                 navHome: "Басты бет",
                 navProjects: "Жобалар",
+                navPricing: "Баға",
                 badgeDev: "Әзірлеуші",
                 subtitle: "Жаңадан бастаушы FRONT END әзірлеуші.",
                 welcome: "Менің жеке парақшама қош келдіңіз!",
@@ -753,7 +1134,23 @@
                 projectsTitle: "Менің жобаларым",
                 footerText: "© 2026 VirusV",
                 openProject: "Ашу →",
-                emptyProjects: "Әзірге жобалар жоқ.<br>Біріншісін кодта қосыңыз!"
+                emptyProjects: "Әзірге жобалар жоқ.<br>Біріншісін кодта қосыңыз!",
+                pricingBadge: "Тапсырысқа қолжетімді",
+                pricingTitle: "Қызметтер <span>&amp; Бағалар</span>",
+                pricingSub: "Кілт тапсыру — қарапайым лендингтен Telegram қосымшасына дейін",
+                prFrom:"бастап", prTag1:"Бастау", prTag2:"★ Танымал", prTag3:"Жылдам",
+                prName1:"Лендинг / Визитка", prName2:"Telegram Mini App", prName3:"Автоматтандыру",
+                prDesc1:"Бизнес, портфолио немесе қызметтерге арналған бір бетті сайт",
+                prDesc2:"Деректер базасы бар Telegram ішіндегі толық қосымша",
+                prDesc3:"Уақытыңызды үнемдейтін скрипттер, парсерлер және боттар",
+                prNote1:"$150 дейін · көлеміне байланысты", prNote2:"$600+ дейін · күрделі жобалар үшін", prNote3:"$100 дейін · дайын скрипт үшін",
+                prF1a:"Адаптивті верстка (mobile-first)",prF1b:"Кері байланыс формасы",prF1c:"Галерея / портфолио",prF1d:"Негізгі SEO және метатегтер",
+                prF2a:"FastAPI бэкенд + PostgreSQL",prF2b:"Telegram Bot API интеграциясы",prF2c:"Telegram арқылы авторизация",prF2d:"Сервер / бұлтқа деплой",prF2e:"Көптілділік (RU / KZ / EN)",
+                prF3a:"Деректер мен сайттарды парсинг",prF3b:"Тапсырмаға арналған Telegram-бот",prF3c:"Автоматты жіберу",prF3d:"Үшінші тарап API интеграциясы",
+                prDeadline1:"Мерзім: <b>2–4 күн</b>", prDeadline2:"Мерзім: <b>1–3 апта</b>", prDeadline3:"Мерзім: <b>1–3 күн</b>",
+                prBtn:"Талқылау →", prBtnMain:"Жоба тапсырыс беру →",
+                prHourlyLabel:"Сағаттық ставка", prHourlySub:"Бекітілген жобадан тыс тапсырмалар үшін",
+                prNoteText:"Барлық бағалар <strong>келісімді</strong> — жобаңыздың егжей-тегжейін талқылайық"
             }
         };
 
